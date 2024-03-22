@@ -1,28 +1,46 @@
 import React, { useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import fb_logo from '../../assets/img/fb_logo.png'
 import g_logo from '../../assets/img/g_logo.png'
 import git_logo from '../../assets/img/git_logo.png'
 import log from '../../assets/img/log.png'
+import { login } from '../../store/authSlice'
 import { Button, Input, Select } from '../UI/index'
+import authService from '../services/authService'
 
 function Signup() {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const password = useRef();
     password.current = watch('password', "");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const forms = {
         username: { label: "Username", name: "username", placeholder: "Username", error: 'Username is required.' },
         email: { label: "Email", type: "email", name: "email", placeholder: "Email", error: 'Email is required.' },
         password: { label: "Password", type: "password", name: "password", placeholder: "Password", error: 'Password length must enter min 5.' },
         cpassword: { label: "Confirm Password", type: "password", name: "cpassword", placeholder: "Confirm Password", error: 'The Password do not match' },
-        select: { label: "Role", name: "role", options: ['ADMIN', 'USER'] },
+        select: { label: "Role", name: "role", options: ['ADMIN', 'USER'], disabled: true },
     }
 
-    const onSubmit = (data) => {
-        console.log(data);
-        reset();
+    const onSubmit = async (data) => {
+        delete data.cpassword;
+        try {
+            await authService.createUser(data);
+            const user = { username: data.username, password: data.password }
+            const response = await authService.login(user);
+            dispatch(login(response));
+            if (response?.data?.accessToken) {
+                toast.success(response?.message);
+                navigate('/');
+                reset();
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message);
+        }
     }
 
 

@@ -1,17 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import App from './App';
-import { Home, Login, Signup } from './components';
+import { Home, Login, ProtectedRoute, Signup, Todo } from './components';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import store from './store/store';
 
 const router = createBrowserRouter([
   {
     path: '/', element: <App />, children: [
-      { path: '/', element: <Home /> },
-      { path: '/login', element: <Login /> },
-      { path: '/signup', element: <Signup /> }
+      { path: '/', element: <ProtectedRoute authentication={false}><Home /></ProtectedRoute> },
+      { path: '/login', element: <ProtectedRoute authentication={false}><Login /></ProtectedRoute> },
+      { path: '/signup', element: <ProtectedRoute authentication={false}><Signup /></ProtectedRoute> },
+      { path: '/todo', element: <ProtectedRoute authentication><Todo /></ProtectedRoute> },
     ]
   }
 
@@ -21,7 +24,9 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );
 

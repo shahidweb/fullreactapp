@@ -1,16 +1,21 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import fb_logo from '../../assets/img/fb_logo.png'
 import g_logo from '../../assets/img/g_logo.png'
 import git_logo from '../../assets/img/git_logo.png'
 import log from '../../assets/img/log.png'
+import { login } from '../../store/authSlice'
 import { Button, Input } from '../UI/index'
-import config from '../const/config'
+import authService from '../services/authService'
 
 
 function Login() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const forms = {
     username: { label: "Username", name: "username", placeholder: "Username", error: 'Username is required.' },
@@ -18,18 +23,18 @@ function Login() {
   }
 
   const onSubmit = async (data) => {
-    console.log(data)
-    const res = await fetch(`${config.baseUrl}/users/login`, {
-      method: "POST",
-      headers: { 'content-type': "application/json" },
-      body: JSON.stringify(data)
-    });
-    const result = await res.json();
-    console.log(result);
-    reset();
+    try {
+      const authDetails = await authService.login(data);
+      dispatch(login(authDetails));
+      if (authDetails?.data?.accessToken) {
+        toast.success(authDetails?.message);
+        navigate('/');
+        reset();
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
   }
-
-
 
   return (
     <div className="relative flex items-top justify-center min-h-[600px] bg-white sm:items-center sm:pt-0">
@@ -41,7 +46,6 @@ function Login() {
           <div className="p-6 flex flex-col justify-center">
             <span>Welcome back !!!</span>
             <h2 className='text-4xl font-bold dark:text-white mb-5'>Log In</h2>
-
             <form onSubmit={handleSubmit(onSubmit)} className='text-left' >
               <div className="flex flex-col mt-2">
                 <Input {...forms.username} form={register('username', { required: true })} />
@@ -72,6 +76,7 @@ function Login() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }
