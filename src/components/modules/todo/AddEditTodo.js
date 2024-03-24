@@ -77,7 +77,7 @@ function AddEditTodo(props) {
         <Button onClick={() => setOpen(true)} isPrimary={true}>Add Todo</Button>
       </div>
 
-      <DialogBox inputs={{ open, setOpen, header: "Add Todo" }}>
+      <DialogBox inputs={{ open, setOpen, header: edit.isEdit ? 'Edit Todo' : 'Add Todo' }}>
 
         <form onSubmit={handleSubmit(onSubmit)} className='text-left' >
           <div className='p-4 mb-2'>
