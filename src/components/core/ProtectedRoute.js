@@ -7,7 +7,6 @@ function ProtectedRoute({ children, authentication = true }) {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
     const navigate = useNavigate();
 
-    console.log(isLoggedIn)
     useEffect(() => {
         if (authentication && isLoggedIn !== authentication) {
             navigate('/login')

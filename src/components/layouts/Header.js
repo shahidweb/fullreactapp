@@ -1,10 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { logout } from '../../store/authSlice';
 import Button from '../UI/Button';
-import authService from '../services/authService'
-import { toast } from 'react-toastify';
 
 function Header() {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);

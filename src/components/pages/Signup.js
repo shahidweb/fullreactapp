@@ -28,8 +28,10 @@ function Signup() {
 
     const onSubmit = async (data) => {
         delete data.cpassword;
+        data.role = 'ADMIN';
         try {
-            await authService.createUser(data);
+            const create = await authService.createUser(data);
+            if(create.statusCode !== 200) return;
             const user = { username: data.username, password: data.password }
             const response = await authService.login(user);
             dispatch(login(response));

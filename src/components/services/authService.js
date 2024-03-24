@@ -20,6 +20,8 @@ export class AuthService {
     async login(data) {
         try {
             const response = await axios.post(`${this.baseUrl}/users/login`, data);
+            document.cookie = `accessToken=${response.data.data.accessToken};`
+            document.cookie = `refreshToken=${response.data.data.refreshToken};`
             return response.data;
         } catch (error) {
             throw error;
