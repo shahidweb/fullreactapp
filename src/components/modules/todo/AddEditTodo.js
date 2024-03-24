@@ -19,13 +19,14 @@ function AddEditTodo(props) {
     const isEdit = props?.edit?._id ? true : false
     const data = props?.edit
     setEdit({ isEdit, data });
+
     if (isEdit) {
       setValue('title', data.title);
       setValue('description', data.description);
     }
     setOpen(isEdit);
 
-  }, [props])
+  }, [props, setValue])
 
   const onSubmit = async (data) => {
     if (!edit.isEdit) {
