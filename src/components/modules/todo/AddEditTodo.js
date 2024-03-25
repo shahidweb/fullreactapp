@@ -1,72 +1,56 @@
 import React, { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addTodo, editTodo } from '../../../store/todoSlice';
+import { addTodo, editTodo, selectEditTodo } from '../../../store/todoSlice';
 import { DialogBox, Input } from '../../UI';
 import Button from '../../UI/Button';
 import todoService from '../../services/todoService';
 
 
-function AddEditTodo(props) {
+function AddEditTodo() {
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
-  const dispatch = useDispatch();
   const [edit, setEdit] = useState({ isEdit: false, data: {} })
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
+
+  const dispatch = useDispatch();
+  const todo = useSelector((state) => state.todo);
+
 
   useEffect(() => {
-    const isEdit = props?.edit?._id ? true : false
-    const data = props?.edit
-    setEdit({ isEdit, data });
-
-    if (isEdit) {
-      setValue('title', data.title);
-      setValue('description', data.description);
-    } else {
-      setValue('title', '');
-      setValue('description', '');
-    }
+    const isEdit = todo.selectedId ? true : false;
     setOpen(isEdit);
-
-  }, [props, setValue])
-
-  const onSubmit = async (data) => {
-    if (!edit.isEdit) {
-      try {
-        const res = await todoService.add(data);
-        if (res.success) {
-          dispatch(addTodo(res.data))
-          setOpen(false);
-          reset();
-          toast.success(res.message)
-        }
-        else console.log(res);
-      } catch (error) {
-        toast.error(error.message)
-      }
-    } else {
-      try {
-        const res = await todoService.edit(edit.data._id, data);
-        if (res.success) {
-          dispatch(editTodo({ id: edit.data._id, data }))
-          toast.success(res.message);
-          props.closeHandler()
-        } else console.log(res)
-      } catch (error) {
-        toast.error(error.message)
-      }
-    }
-  }
-
-  const onCancel = () => {
-    setOpen(false)
     setValue('title', '');
     setValue('description', '');
-    setEdit({ isEdit: false, data: {} })
-    props.closeHandler()
-  }
+    setEdit({ isEdit, data: {} })
 
+    if (isEdit) {
+      const data = todo.data.find(item => item._id === todo.selectedId)
+      setValue('title', data.title);
+      setValue('description', data.description);
+      setEdit({ isEdit, data })
+    }
+  }, [setValue, todo])
+
+  const onSubmit = async (data) => {
+    try {
+      let res = {};
+      if (edit.isEdit) {
+        res = await todoService.edit(edit.data._id, data);
+        if (res.success) dispatch(editTodo({ id: edit.data._id, data }))
+      }
+      else { //AddNew
+        res = await todoService.add(data);
+        if (res.success) dispatch(addTodo(res.data))
+      }
+      reset();
+      setOpen(false);
+      toast.success(res.message ? res.message : 'Something went wrong')
+    } catch (error) {
+      toast.error(error.message ? error.message : 'Something went wrong')
+    }
+  }
 
 
   const forms = {
@@ -79,9 +63,7 @@ function AddEditTodo(props) {
       <div className='fixed bottom-24 right-20 z-20'>
         <Button onClick={() => setOpen(true)} isPrimary={true}>Add Todo</Button>
       </div>
-
       <DialogBox inputs={{ open, setOpen, header: edit.isEdit ? 'Edit Todo' : 'Add Todo' }}>
-
         <form onSubmit={handleSubmit(onSubmit)} className='text-left' >
           <div className='p-4 mb-2'>
             <div className="flex flex-col mt-2">
@@ -94,11 +76,10 @@ function AddEditTodo(props) {
             </div>
           </div>
           <div className="bg-gray-50 py-3 text-end">
-            <Button isPrimary={false} onClick={onCancel}> Cancel </Button>
+            <Button isPrimary={false} onClick={() => dispatch(selectEditTodo(''))}> Cancel </Button>
             <Button type="submit" isPrimary={true}> {edit.isEdit ? "Update" : "Add"} Todo</Button>
           </div>
         </form>
-
       </DialogBox>
     </>
   )

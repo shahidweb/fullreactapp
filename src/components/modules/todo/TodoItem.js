@@ -1,11 +1,25 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { deleteTodo, selectEditTodo } from '../../../store/todoSlice';
 import Button from '../../UI/Button';
+import todoService from '../../services/todoService';
 
 function TodoItem(props) {
-    if (!props.title) return;
+    const { title, description, _id, } = props;
+    const dispatch = useDispatch();
 
-    const { title, description, _id, } = props; //isComplete, createdAt
-    const onEventHandler = props.onEventHandler
+    const onDelete = async (id) => {
+        try {
+            const res = await todoService.delete(id);
+            if (res.success) {
+                dispatch(deleteTodo(id))
+                toast.success(res.message);
+            } else console.log(res)
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     return (
         <div key={_id} className="max-w-sm rounded overflow-hidden shadow-lg">
@@ -15,8 +29,8 @@ function TodoItem(props) {
                 <p className="text-gray-700 text-base">{description ? description : "Some description about above topic"}</p>
             </div>
             <div className="px-6 pt-4 pb-2">
-                <Button onClick={() => onEventHandler(_id, 'edit')}>Edit</Button>
-                <Button isPrimary={true} onClick={() => onEventHandler(_id, 'delete')}>Delete</Button>
+                <Button onClick={() => dispatch(selectEditTodo(_id))}>Edit</Button>
+                <Button isPrimary={true} onClick={() => onDelete(_id)}>Delete</Button>
             </div>
         </div>
     )
