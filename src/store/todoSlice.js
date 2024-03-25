@@ -18,7 +18,7 @@ const todoSlice = createSlice({
         },
         editTodo: (state, action) => {
             const index = state.data.findIndex(item => item._id === action.payload.id);
-            state.data[index] = { ...action.payload.data }
+            state.data[index] = { ...state.data[index], ...action.payload.data }
         },
         deleteTodo: (state, action) => {
             state.data = state.data.filter(item => item._id !== action.payload)

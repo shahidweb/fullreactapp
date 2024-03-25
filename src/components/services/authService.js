@@ -30,10 +30,10 @@ export class AuthService {
 
     async logout(data) {
         try {
+            let decodedCookie = document.cookie
+            let tokens = decodedCookie.split(';');
             const axiosConfig = {
-                headers: {
-                    "cookie": document.cookie
-                }
+                headers: {"cookies": tokens[0] }
             };
             const res = await axios.post(`${this.baseUrl}/users/logout`, data, axiosConfig);
             return res.data;

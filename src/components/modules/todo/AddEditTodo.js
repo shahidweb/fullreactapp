@@ -23,6 +23,9 @@ function AddEditTodo(props) {
     if (isEdit) {
       setValue('title', data.title);
       setValue('description', data.description);
+    } else {
+      setValue('title', '');
+      setValue('description', '');
     }
     setOpen(isEdit);
 

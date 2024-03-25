@@ -4,6 +4,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { logout } from '../../store/authSlice';
 import Button from '../UI/Button';
+import authService from '../services/authService';
 
 function Header() {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -19,7 +20,7 @@ function Header() {
 
     const logoutHandler = async () => {
         try {
-            // await authService.logout();   // I could not set cookie in header throw error > refuse 
+            await authService.logout();   // I could not set cookie in header throw error > refuse 
             toast.success('User logged out');          
             dispatch(logout())
             navigate('/login');
