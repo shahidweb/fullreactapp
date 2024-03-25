@@ -2,12 +2,12 @@ import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment, useRef } from 'react';
 
 function DialogBox(props) {
-    const { open, setOpen, header } = props.inputs;
+    const { open, onClosePopup, header } = props.inputs;
     const cancelButtonRef = useRef(null)
 
     return (
         <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setOpen}>
+            <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={onClosePopup}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"

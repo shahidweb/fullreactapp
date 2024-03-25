@@ -17,20 +17,23 @@ function AddEditTodo() {
   const dispatch = useDispatch();
   const todo = useSelector((state) => state.todo);
 
-
   useEffect(() => {
     const isEdit = todo.selectedId ? true : false;
     setOpen(isEdit);
-    setValue('title', '');
-    setValue('description', '');
-    setEdit({ isEdit, data: {} })
 
     if (isEdit) {
       const data = todo.data.find(item => item._id === todo.selectedId)
       setValue('title', data.title);
       setValue('description', data.description);
       setEdit({ isEdit, data })
+    } else {
+      setValue('title', '');
+      setValue('description', '');
+      setEdit({ isEdit, data: {} })
+      dispatch(selectEditTodo(''))
+      console.log(open)
     }
+
   }, [setValue, todo])
 
   const onSubmit = async (data) => {
@@ -52,6 +55,10 @@ function AddEditTodo() {
     }
   }
 
+  const onClosePopup = () => {
+    setOpen(false);
+    dispatch(selectEditTodo(''))
+  }
 
   const forms = {
     title: { label: "Title", name: "title", placeholder: "Title", error: 'Todo title is required', },
@@ -63,7 +70,7 @@ function AddEditTodo() {
       <div className='fixed bottom-24 right-20 z-20'>
         <Button onClick={() => setOpen(true)} isPrimary={true}>Add Todo</Button>
       </div>
-      <DialogBox inputs={{ open, setOpen, header: edit.isEdit ? 'Edit Todo' : 'Add Todo' }}>
+      <DialogBox inputs={{ open, onClosePopup, header: edit.isEdit ? 'Edit Todo' : 'Add Todo' }}>
         <form onSubmit={handleSubmit(onSubmit)} className='text-left' >
           <div className='p-4 mb-2'>
             <div className="flex flex-col mt-2">
@@ -76,7 +83,7 @@ function AddEditTodo() {
             </div>
           </div>
           <div className="bg-gray-50 py-3 text-end">
-            <Button isPrimary={false} onClick={() => dispatch(selectEditTodo(''))}> Cancel </Button>
+            <Button isPrimary={false} onClick={() => onClosePopup()}> Cancel </Button>
             <Button type="submit" isPrimary={true}> {edit.isEdit ? "Update" : "Add"} Todo</Button>
           </div>
         </form>
