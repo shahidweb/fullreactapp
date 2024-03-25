@@ -30,8 +30,6 @@ function AddEditTodo() {
       setValue('title', '');
       setValue('description', '');
       setEdit({ isEdit, data: {} })
-      dispatch(selectEditTodo(''))
-      console.log(open)
     }
 
   }, [setValue, todo])
